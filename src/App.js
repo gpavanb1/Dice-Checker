@@ -5,7 +5,7 @@ import MainPage from './MainPage';
 function App() {
   return (
     <div>
-      <h1 class="text-center">Dice Checker</h1>
+      <h1 className="text-center">Dice Checker</h1>
       <hr />
       <MainPage />
     </div>
