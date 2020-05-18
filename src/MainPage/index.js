@@ -1,21 +1,42 @@
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
+import { parseRolls, pearsonTest, outputFromState } from './helper';
 import './index.css';
 
 class MainPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            numFaces: 1,
-            rolls: ""
+            numFaces: 6,
+            rolls: "",
+            result: null
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleRollChange = this.handleRollChange.bind(this);
         this.handleDDChange = this.handleDDChange.bind(this);
     }
 
     handleSubmit() {
-        alert('lol');
+        let res = null;
+        try {
+            res = parseRolls(
+                this.state.rolls,
+                this.state.numFaces
+            );
+        }
+        catch(err) {
+            alert(err.message);
+        }
+
+        finally {
+            const ret = pearsonTest(res, this.state.numFaces);
+            this.setState({ result: ret.probability});
+        }
+    }
+
+    handleRollChange(e) {
+        this.setState({ rolls: e.target.value });
     }
 
     handleDDChange(e) {
@@ -24,16 +45,17 @@ class MainPage extends Component {
 
     render() {
         const optionItems = constructRange(20).map(
-            (i) => <option key={i}>{i}</option>
+            (i) => <option key={i} value={parseInt(i)}>{i}</option>
         );
 
         return (
-            <form onSubmit={this.handleSubmit}>
+            <div>
                 <h3 className="m-1 text-left">
                     Number of faces: 
                 </h3>
                 <select 
                 id="dropdown" 
+                value={this.state.numFaces}
                 className="m-2"
                 onChange={this.handleDDChange}>
                     {optionItems}
@@ -42,15 +64,22 @@ class MainPage extends Component {
                 <h3 className="m-1 text-left">
                     Enter the sequence of rolls
                 </h3>
-                <textarea className="m-2" 
+                <textarea 
+                className="m-2" 
+                onChange={this.handleRollChange}
                 id="textbox" rows={4} />
 
                 <div className="m-2">
-                    <Button>
+                    <Button onClick={this.handleSubmit}>
                         Submit
                     </Button>
-                </div>     
-            </form>      
+                </div>
+
+                <hr className="my-3"/>
+
+                {this.state.result ? 
+                outputFromState(this.state.result) : null}
+            </div>        
         );
     }
 }
