@@ -21,15 +21,12 @@ export function parseRolls(s, numFaces) {
 }
 
 export function pearsonTest(arr, numFaces) {
-    const expected = Array(numFaces).fill(1);
-    const reduction = 1;
     const observed = getFrequencies(arr, numFaces);
+    const numRolls = arr.length;
+    const expected = Array(numFaces).fill(numRolls/numFaces);
+    const reduction = 1;
 
-    // Normalize both arrays
-    const normExpected = normalize(expected);
-    const normObserved = normalize(observed);
-
-    const prob = chiSquaredTest(normObserved, normExpected, reduction);
+    const prob = chiSquaredTest(observed, expected, reduction);
 
     if (arr.length < 5 * numFaces) {
         alert('Warning: Too few rolls to use statistical test')
@@ -63,15 +60,4 @@ export function outputFromState(prob) {
 
 function truncate(num, decimalPlaces) {
     return parseFloat(num.toFixed(decimalPlaces));
-}
-
-
-function normalize(arr) {
-    var ret = [...arr];
-    const sum = arr.reduce((a,b) => a + b, 0)
-    for (let i = 0; i < arr.length; i++) {
-        ret[i] /= sum;
-    }
-
-    return ret;
 }
